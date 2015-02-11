@@ -1,5 +1,5 @@
 <?php
- 
+
 /**
  * Utils of OneLogin PHP Toolkit
  *
@@ -9,11 +9,11 @@
 class OneLogin_Saml2_Utils
 {
     /**
-    * Translates any string. Accepts args  
+    * Translates any string. Accepts args
     *
     * @param string $msg  Message to be translated
     * @param array  $args Arguments
-    * 
+    *
     * @return string $translatedMsg  Translated text
     */
     public static function t($msg, $args = array())
@@ -105,7 +105,7 @@ class OneLogin_Saml2_Utils
 
             if ($debug) {
                 foreach ($xmlErrors as $error) {
-                    echo $error->message."\n";
+                    echo esc_html( $error->message ) ."\n" ;
                 }
             }
 
@@ -202,7 +202,7 @@ class OneLogin_Saml2_Utils
             );
         }
 
-        
+
         /* Add encoded parameters */
         if (strpos($url, '?') === false) {
             $paramPrefix = '?';
@@ -586,7 +586,7 @@ class OneLogin_Saml2_Utils
      *
      * @param DOMDocument $dom     The DOMDocument
      * @param string      $query   Xpath Expresion
-     * @param DomElement  $context Context Node (DomElement) 
+     * @param DomElement  $context Context Node (DomElement)
      *
      * @return DOMNodeList The queried nodes
      */
@@ -864,7 +864,7 @@ class OneLogin_Saml2_Utils
         if (!$newDoc) {
             throw new Exception('Failed to parse decrypted XML.');
         }
- 
+
         $decryptedElement = $newDoc->firstChild->firstChild;
         if ($decryptedElement === null) {
             throw new Exception('Missing encrypted element.');

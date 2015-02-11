@@ -39,7 +39,9 @@ if ($prevent_reset_password) {
 $action = isset($_REQUEST['action']) ? $_REQUEST['action'] : 'login';
 
 // Handle SLO
-if (isset($_COOKIE['saml_login']) && get_option('onelogin_saml_slo')) { 
+// @todo Note: $_COOKIE does not work reliable in a cached/cloud hosting environment.
+//
+if (isset($_COOKIE['saml_login']) && get_option('onelogin_saml_slo')) {
 	add_action('init', 'saml_slo', 1);
 }
 

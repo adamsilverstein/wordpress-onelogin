@@ -23,7 +23,7 @@ function saml_load_translations() {
 	$domain = 'onelogin-saml-sso';
 	$mo_file = plugin_dir_path(dirname(__FILE__)) . 'lang/'.get_locale() . '/' . $domain  . '.mo';
 
-	load_textdomain($domain, $mo_file ); 
+	load_textdomain($domain, $mo_file );
 	load_plugin_textdomain($domain, false, dirname( plugin_basename( __FILE__ ) ) . '/lang/'. get_locale() . '/' );
 }
 
@@ -79,9 +79,9 @@ function saml_acs() {
 
 	$errors = $auth->getErrors();
 	if (!empty($errors)) {
-		echo '<br>'.__("There was at least one error processing the SAML Response").': ';
-		echo implode("<br>", $errors);
-		echo '<br>'.__("Contact the administrator");
+		echo '<br>'.esc_html__("There was at least one error processing the SAML Response").': ';
+		echo implode("<br>", esc_html( $errors ) );
+		echo '<br>'.esc_html__("Contact the administrator");
 		exit();
 	}
 
@@ -92,7 +92,7 @@ function saml_acs() {
 		$email = $username;
 	} else {
 		$usernameMapping = get_option('onelogin_saml_attr_mapping_username');
-		$mailMapping =  get_option('onelogin_saml_attr_mapping_mail'); 
+		$mailMapping =  get_option('onelogin_saml_attr_mapping_mail');
 
 		if (!empty($usernameMapping) && isset($attrs[$usernameMapping]) && !empty($attrs[$usernameMapping][0])){
 			$username = $attrs[$usernameMapping][0];
@@ -103,12 +103,12 @@ function saml_acs() {
 	}
 
 	if (empty($username)) {
-		echo __("The username could not be retrieved from the IdP and is required");
+		echo esc_html__("The username could not be retrieved from the IdP and is required");
 		exit();
 	}
 	else if (empty($email)) {
-		echo __("The email could not be retrieved from the IdP and is required");
-		exit();	
+		echo esc_html__("The email could not be retrieved from the IdP and is required");
+		exit();
 	} else {
 		$userdata = array();
 		$userdata['user_login'] = wp_slash($username);
@@ -165,7 +165,7 @@ function saml_acs() {
 				foreach ($attrs[$roleMapping] as $samlRole) {
 					$samlRole = trim($samlRole);
 					if (empty($samlRole)) {
-						break;	
+						break;
 					}
 					else if (in_array($samlRole, $adminsRole)) {
 						if ($role < 5) {
@@ -211,18 +211,18 @@ function saml_acs() {
 					case 1:
 					case 0:
 					default:
-						$userdata['role'] = 'subscriber';		
+						$userdata['role'] = 'subscriber';
 						break;
 				}
 			}
 		}
 	}
-	
+
 	$matcher = get_option('onelogin_saml_account_matcher');
 
 	if (empty($matcher) || $matcher == 'username') {
 		$matcherValue = $userdata['user_login'];
-		$user_id = username_exists($matcherValue);		
+		$user_id = username_exists($matcherValue);
 	} else {
 		$matcherValue = $userdata['user_email'];
 		$user_id = email_exists($matcherValue);
@@ -236,19 +236,19 @@ function saml_acs() {
 		}
 	} else if (get_option('onelogin_saml_autocreate')) {
 		if (!validate_username($username)) {
-			echo __("The username provided by the IdP"). ' "'. $username. '" '. __("is not valid and can't create the user at wordpress");
-			return false;			
+			echo esc_html__("The username provided by the IdP"). ' "'. $username. '" '. esc_html__("is not valid and can't create the user at wordpress");
+			return false;
 		}
 		$userdata['user_pass'] = '@@@nopass@@@';
 		$user_id = wp_insert_user($userdata);
 	} else {
-		echo __("User provided by the IdP "). ' "'. $matcherValue. '" '. __("not exists in wordpress and auto-provisioning is disabled.");
+		echo esc_html__("User provided by the IdP "). ' "'. $matcherValue. '" '. esc_html__("not exists in wordpress and auto-provisioning is disabled.");
 		return false;
 	}
 
 	if (is_a($user_id, 'WP_Error')) {
 		$error = $user_id->get_error_messages();
-		echo implode('<br>', $error);
+		echo implode('<br>', esc_html( $error ) );
 		exit();
 	} else if ($user_id) {
 		wp_set_current_user($user_id);
@@ -298,7 +298,7 @@ function saml_metadata() {
 	$auth = initialize_saml();
 	$settings = $auth->getSettings();
 	$metadata = $settings->getSPMetadata();
-	
+
 	header('Content-Type: text/xml');
 	echo $metadata;
 	exit();
@@ -320,9 +320,9 @@ function initialize_saml() {
 	try {
 		$auth = new Onelogin_Saml2_Auth($settings);
 	} catch (Exception $e) {
-		echo '<br>'.__("The Onelogin SSO/SAML plugin is not correctly configured.", 'onelogin-saml-sso').'<br>';
+		echo '<br>'.esc_html__("The Onelogin SSO/SAML plugin is not correctly configured.", 'onelogin-saml-sso').'<br>';
 		print_r($e->getMessage());
-		echo '<br>'.__("If you are the administrator", 'onelogin-saml-sso').', <a href="'.get_site_url().'/wp-login.php?normal">'.__("access using your wordpress credentials", 'onelogin-saml-sso').'</a> '.__("and fix the problem", 'onelogin-saml-sso');
+		echo '<br>'.esc_html__("If you are the administrator", 'onelogin-saml-sso').', <a href="'.get_site_url().'/wp-login.php?normal">'.esc_html__("access using your wordpress credentials", 'onelogin-saml-sso').'</a> '.esc_html__("and fix the problem", 'onelogin-saml-sso');
 		exit();
 	}
 

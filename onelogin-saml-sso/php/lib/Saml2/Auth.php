@@ -1,5 +1,5 @@
 <?php
- 
+
 /**
  * Main class of OneLogin's PHP Toolkit
  *
@@ -37,7 +37,7 @@ class OneLogin_Saml2_Auth
 
 
     /**
-     * SessionIndex. When the user is logged, this stored the 
+     * SessionIndex. When the user is logged, this stored the
      * from the AuthnStatement of the SAML Response
      */
     private $_sessionIndex;
@@ -99,6 +99,7 @@ class OneLogin_Saml2_Auth
         $this->_errors = array();
         if (isset($_POST) && isset($_POST['SAMLResponse'])) {
             // AuthnResponse -- HTTP_POST Binding
+            // @todo consider/test sanitize_text_field for $_POST['SAMLResponse']
             $response = new OneLogin_Saml2_Response($this->_settings, $_POST['SAMLResponse']);
 
             if ($response->isValid($requestId)) {
@@ -141,6 +142,7 @@ class OneLogin_Saml2_Auth
                 }
             }
         } else if (isset($_GET) && isset($_GET['SAMLRequest'])) {
+			// @todo consider/test sanitize_text_field or sanitize_key on $_GET['SAMLRequest']
             $logoutRequest = new OneLogin_Saml2_LogoutRequest($this->_settings, $_GET['SAMLRequest']);
             if (!$logoutRequest->isValid($retrieveParametersFromServer)) {
                 $this->_errors[] = 'invalid_logout_request';
@@ -149,6 +151,7 @@ class OneLogin_Saml2_Auth
                 if (!$keepLocalSession) {
                     OneLogin_Saml2_Utils::deleteLocalSession();
                 }
+                // @todo consider/test sanitize_text_field or sanitize_key on $_GET['SAMLRequest']
                 $inResponseTo = OneLogin_Saml2_LogoutRequest::getID(gzinflate(base64_decode($_GET['SAMLRequest'])));
                 $responseBuilder = new OneLogin_Saml2_LogoutResponse($this->_settings);
                 $responseBuilder->build($inResponseTo);
@@ -156,7 +159,7 @@ class OneLogin_Saml2_Auth
 
                 $parameters = array('SAMLResponse' => $logoutResponse);
                 if (isset($_GET['RelayState'])) {
-                    $parameters['RelayState'] = $_GET['RelayState'];
+                    $parameters['RelayState'] = sanitize_text_field( $_GET['RelayState'] );
                 }
 
                 $security = $this->_settings->getSecurityData();
@@ -281,7 +284,7 @@ class OneLogin_Saml2_Auth
      * @param array  $parameters Extra parameters to be added to the GET
      * @param bool   $forceAuthn When true the AuthNReuqest will set the ForceAuthn='true'
      * @param bool   $isPassive  When true the AuthNReuqest will set the Ispassive='true'
-     *  
+     *
      */
     public function login($returnTo = null, $parameters = array(), $forceAuthn = false, $isPassive = false)
     {
@@ -411,9 +414,9 @@ class OneLogin_Saml2_Auth
      * Generates the Signature for a SAML Response
      *
      * @param string $samlResponse The SAML Response
-     * @param string $relayState   The RelayState     
+     * @param string $relayState   The RelayState
      *
-     * @return string A base64 encoded signature 
+     * @return string A base64 encoded signature
      */
     public function buildResponseSignature($samlResponse, $relayState)
     {

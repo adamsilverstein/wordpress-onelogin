@@ -47,7 +47,7 @@ class OneLogin_Saml2_LogoutRequest
             $id = OneLogin_Saml2_Utils::generateUniqueID();
             $nameIdValue = OneLogin_Saml2_Utils::generateUniqueID();
             $issueInstant = OneLogin_Saml2_Utils::parseTime2SAML(time());
-            
+
             $cert = null;
             if (isset($security['nameIdEncrypted']) && $security['nameIdEncrypted']) {
                 $cert = $idpData['x509cert'];
@@ -132,7 +132,7 @@ LOGOUTREQUEST;
      *
      * @param string|DOMDocument $request Logout Request Message
      * @param string             $key     The SP key
-     *     
+     *
      * @return array Name ID Data (Value, Format, NameQualifier, SPNameQualifier)
      */
     public static function getNameIdData($request, $key = null)
@@ -185,7 +185,7 @@ LOGOUTREQUEST;
      * Gets the NameID of the Logout Request.
      *
      * @param string|DOMDocument $request Logout Request Message
-     * @param string             $key     The SP key     
+     * @param string             $key     The SP key
      *
      * @return string Name ID Value
      */
@@ -222,11 +222,11 @@ LOGOUTREQUEST;
     /**
      * Gets the SessionIndexes from the Logout Request.
      * Notice: Our Constructor only support 1 SessionIndex but this parser
-     *         extracts an array of all the  SessionIndex found on a  
+     *         extracts an array of all the  SessionIndex found on a
      *         Logout Request, that could be many.
      *
      * @param string|DOMDocument $request Logout Request Message
-     * 
+     *
      * @return array The SessionIndex value
      */
     public static function getSessionIndexes($request)
@@ -306,7 +306,7 @@ LOGOUTREQUEST;
             }
 
             if (isset($_GET['Signature'])) {
-
+                // @todo Consider/test sanitize_key for $_GET['SigAlg']
                 if (!isset($_GET['SigAlg'])) {
                     $signAlg = XMLSecurityKey::RSA_SHA1;
                 } else {
@@ -320,6 +320,7 @@ LOGOUTREQUEST;
                     }
                     $signedQuery .= '&SigAlg='.OneLogin_Saml2_Utils::extractOriginalQueryParam('SigAlg');
                 } else {
+                    // @todo Consider/test sanitize_key for $_GET
                     $signedQuery = 'SAMLRequest='.urlencode($_GET['SAMLRequest']);
                     if (isset($_GET['RelayState'])) {
                         $signedQuery .= '&RelayState='.urlencode($_GET['RelayState']);
@@ -353,7 +354,7 @@ LOGOUTREQUEST;
             $this->_error = $e->getMessage();
             $debug = $this->_settings->isDebugActive();
             if ($debug) {
-                echo $this->_error;
+                echo esc_html( $this->_error );
             }
             return false;
         }
@@ -361,7 +362,7 @@ LOGOUTREQUEST;
 
     /* After execute a validation process, if fails this method returns the cause
      *
-     * @return string Cause 
+     * @return string Cause
      */
     public function getError()
     {

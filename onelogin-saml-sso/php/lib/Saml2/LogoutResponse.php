@@ -71,7 +71,7 @@ class OneLogin_Saml2_LogoutResponse
 
     /**
      * Gets the Status of the Logout Response.
-     * 
+     *
      * @return string The Status
      */
     public function getStatus()
@@ -146,6 +146,7 @@ class OneLogin_Saml2_LogoutResponse
                 if (!isset($_GET['SigAlg'])) {
                     $signAlg = XMLSecurityKey::RSA_SHA1;
                 } else {
+                    // @todo Consider/test sanitize_key for $_GET[
                     $signAlg = $_GET['SigAlg'];
                 }
 
@@ -156,6 +157,7 @@ class OneLogin_Saml2_LogoutResponse
                     }
                     $signedQuery .= '&SigAlg='.OneLogin_Saml2_Utils::extractOriginalQueryParam('SigAlg');
                 } else {
+                	// @todo Consider/test sanitize_key for $_GET[
                     $signedQuery = 'SAMLResponse='.urlencode($_GET['SAMLResponse']);
                     if (isset($_GET['RelayState'])) {
                         $signedQuery .= '&RelayState='.urlencode($_GET['RelayState']);
@@ -178,7 +180,7 @@ class OneLogin_Saml2_LogoutResponse
                         throw new Exception('Invalid signAlg in the recieved Logout Response');
                     }
                 }
-
+                // @todo Consider/test sanitize_key for $_GET[
                 if (!$objKey->verifySignature($signedQuery, base64_decode($_GET['Signature']))) {
                     throw new Exception('Signature validation failed. Logout Response rejected');
                 }
@@ -188,7 +190,7 @@ class OneLogin_Saml2_LogoutResponse
             $this->_error = $e->getMessage();
             $debug = $this->_settings->isDebugActive();
             if ($debug) {
-                echo $this->_error;
+                echo esc_html( $this->_error );
             }
             return false;
         }
@@ -210,7 +212,7 @@ class OneLogin_Saml2_LogoutResponse
     /**
      * Generates a Logout Response object.
      *
-     * @param string $inResponseTo InResponseTo value for the Logout Response. 
+     * @param string $inResponseTo InResponseTo value for the Logout Response.
      */
     public function build($inResponseTo)
     {
@@ -252,7 +254,7 @@ LOGOUTRESPONSE;
 
     /* After execute a validation process, if fails this method returns the cause.
      *
-     * @return string Cause 
+     * @return string Cause
      */
     public function getError()
     {
